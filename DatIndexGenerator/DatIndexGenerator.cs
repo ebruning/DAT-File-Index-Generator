@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Kofax.Eclipse.Base;
+using System.IO;
 
 namespace DatIndexGenerator
 {
@@ -29,7 +30,7 @@ namespace DatIndexGenerator
 
         public bool IsCustomizable
         {
-            get { return false; }
+            get { return true; }
         }
 
         public string Name
@@ -37,17 +38,31 @@ namespace DatIndexGenerator
             get { return "DAT file"; }
         }
 
+        #region Settings
         public void DeserializeSettings(System.IO.Stream input) { }
 
         public void SerializeSettings(System.IO.Stream output) { }
 
-        public void Setup(IDictionary<string, string> releaseData) { }
+        public void Setup(IDictionary<string, string> releaseData) { } 
+        #endregion
 
         #endregion
 
         #region IBatchIndexGenerator Members
 
-        public void AppendIndex(IDocument document, string outputFileName) { }
+        public void AppendIndex(IDocument document, string outputFileName) 
+        {
+
+            using (FileStream fs = new FileStream(outputFileName, FileMode.Append, FileAccess.Write, FileShare.None))
+            using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode))
+            {
+               for (int indexNumber = 0; indexNumber < document.IndexDataCount; indexNumber++)
+                   writer.WriteLine("{0}:{1}", document.GetIndexDataLabel(indexNumber), document.GetIndexDataValue(indexNumber));
+
+                writer.Flush();
+                writer.Close();
+            }
+        }
 
         public void EndIndex(object handle, ReleaseResult result, string outputFileName) { }
 
@@ -59,21 +74,44 @@ namespace DatIndexGenerator
 
         #region IDocumentIndexGenerator Members
 
-        public void CreateIndex(IDocument document, IDictionary<string, string> releaseData, string outputFileName)
+        public void CreateIndex(IDocument document, IDictionary<string, string> exportData, string outputFileName)
         {
-           
+            using (FileStream fs = new FileStream(outputFileName, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode))
+            {
+                if (exportData != null)
+                {
+                    for (int indexNumber = 0; indexNumber < document.IndexDataCount; indexNumber++)
+                        writer.WriteLine("{0}:{1}", document.GetIndexDataLabel(indexNumber), document.GetIndexDataValue(indexNumber));
+                }
+                writer.Flush();
+                writer.Close();
+            }
+        }
+
+        public void SerializeSample(IDictionary<string, string> exportData, System.IO.Stream output)
+        {
+            if (output == null)
+                return;
+
+            using (StreamWriter writer = new StreamWriter(output))
+            {
+                if (exportData != null)
+                {
+                    writer.WriteLine("Fieldname1:(value1)");
+                    writer.WriteLine("Fieldname2:(value2)");
+                    writer.WriteLine("Fieldname3:(value3)");
+                }
+                writer.Flush();
+                writer.Close();
+            }
         }
 
         public bool IsSupported(ReleaseMode mode)
         {
             return true;
         }
-
-        public void SerializeSample(IDictionary<string, string> releaseData, System.IO.Stream output)
-        {
-            
-        }
-
+        
         public ReleaseMode WorkingMode
         {
             get
