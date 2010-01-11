@@ -84,6 +84,7 @@ namespace DatIndexGenerator
                     for (int indexNumber = 0; indexNumber < document.IndexDataCount; indexNumber++)
                         writer.WriteLine("{0}:{1}", document.GetIndexDataLabel(indexNumber), document.GetIndexDataValue(indexNumber));
                 }
+                writer.WriteLine("{0}", exportData["DocumentOutputFileName[1]"]);
                 writer.Flush();
                 writer.Close();
             }
