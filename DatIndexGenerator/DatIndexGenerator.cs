@@ -102,6 +102,7 @@ namespace DatIndexGenerator
                     writer.WriteLine("Fieldname1:(value1)");
                     writer.WriteLine("Fieldname2:(value2)");
                     writer.WriteLine("Fieldname3:(value3)");
+                    writer.WriteLine("{0}", Path.Combine(exportData["ReleasePath"], "image.tif"));
                 }
                 writer.Flush();
                 writer.Close();
