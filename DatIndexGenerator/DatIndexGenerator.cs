@@ -11,6 +11,9 @@ namespace DatIndexGenerator
     {
         private ReleaseMode _workingMode;
 
+        //20100211 - Added variable to hold document number
+        private int _documentNumner = 1;
+
         #region IExporter Members
 
         public string DefaultExtension
@@ -77,14 +80,19 @@ namespace DatIndexGenerator
         public void CreateIndex(IDocument document, IDictionary<string, string> exportData, string outputFileName)
         {
             using (FileStream fs = new FileStream(outputFileName, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-            using (StreamWriter writer = new StreamWriter(fs, Encoding.Unicode))
+            using (StreamWriter writer = new StreamWriter(fs, Encoding.ASCII))
             {
                 if (exportData != null)
                 {
                     for (int indexNumber = 0; indexNumber < document.IndexDataCount; indexNumber++)
                         writer.WriteLine("{0}:{1}", document.GetIndexDataLabel(indexNumber), document.GetIndexDataValue(indexNumber));
                 }
-                writer.WriteLine("{0}", exportData["DocumentOutputFileName[1]"]);
+
+                //20100111 - Changed the index to pass the current document number so the correct file is written out
+                writer.WriteLine("{0}", exportData[string.Format("DocumentOutputFileName[{0}]", _documentNumner)]);
+
+                _documentNumner++;
+
                 writer.Flush();
                 writer.Close();
             }
