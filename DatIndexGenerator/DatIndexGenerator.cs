@@ -33,7 +33,8 @@ namespace DatIndexGenerator
 
         public bool IsCustomizable
         {
-            get { return true; }
+            //20100218 - Changed to false. Exporter isn't customizable
+            get { return false; }
         }
 
         public string Name
